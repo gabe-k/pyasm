@@ -1,0 +1,18 @@
+#!/usr/bin/python
+
+import marshal
+import sys
+import pyasm
+from py_compile import MAGIC
+
+if len(sys.argv) != 2:
+	print "Incorrect number of arguments!"
+	exit()
+
+c = pyasm.parse_file(sys.argv[1])
+out_name = sys.argv[1].split('/')[-1].split('.')[0] + '.pyc'
+o = open(out_name, 'wb')
+o.write(MAGIC)
+o.write('\x00\x00\x00\x00')
+o.write(marshal.dumps(c))
+o.close()
