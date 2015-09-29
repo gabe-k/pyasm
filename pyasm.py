@@ -1,6 +1,33 @@
 from dis import opmap
 from types import CodeType
 from StringIO import StringIO
+import dispy
+
+def exec_input(consts=None, names=None, varnames=None, freevars=None, cellvars=None):
+	exec compile_input(consts=consts, names=names, varnames=varnames, freevars=freevars, cellvars=cellvars)
+
+def compile_input(consts=None, names=None, varnames=None, freevars=None, cellvars=None):
+	out = StringIO()
+	out.write('code\n')
+	if consts:
+		dispy.write_list(out, consts, 1, 'consts')
+	if names:
+		dispy.write_list(out, names, 1, 'names')
+	if varnames:
+		dispy.write_list(out, varnames, 1, 'varnames')
+	if freevars:
+		dispy.write_list(out, freevars, 1, 'freevars')
+	if cellvars:
+		dispy.write_list(out, consts, 1, 'cellvars')
+	while 1:
+		print('pyasm>'),
+		line = raw_input()
+		if line.strip() == '':
+			break;
+		out.write(line + '\n')
+	out.write('end\n')
+	out.seek(0)
+	return read_object(out)
 
 def parse_file(filename):
 	f = open(filename, 'r')
