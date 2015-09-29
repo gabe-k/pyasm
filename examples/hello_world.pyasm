@@ -1,0 +1,13 @@
+code
+	consts 2
+		string "Hello world!"
+		none
+	end
+	instructions
+		LOAD_CONST 0
+		PRINT_ITEM
+		PRINT_NEWLINE
+		LOAD_CONST 1
+		RETURN_VALUE
+	end
+end
