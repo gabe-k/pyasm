@@ -92,4 +92,5 @@ def write_code(f, c, indents):
 	f.write('\t' * indents)
 	f.write('end\n')
 
-disassemble_file(sys.argv[1])
+if __name__ == "__main__":
+	disassemble_file(sys.argv[1])
