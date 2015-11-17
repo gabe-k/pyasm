@@ -102,6 +102,30 @@ def read_float(l):
 def read_none(l):
 	return None
 
+def assemble_instructions(f):
+	sio = StringIO()
+	l = read_line(f)
+	while l != 'end':
+		count = 1
+		if len(l.split()) > 2:
+			if l.split()[1] == '*':
+				count = parse_int(l.split()[0])
+				l = l.split(' ', 2)[-1]
+		for i in range(count):
+			if is_number(l[0]):
+				sio.seek(parse_int(l.split()[0]))
+				l = l.split(' ', 1)[1]
+			line = l.split()
+			sio.write(chr(opmap[line[0]]))
+			if len(line) == 2:
+				oparg = parse_int(line[1])
+				sio.write(chr(oparg & 0xFF))
+				sio.write(chr((oparg >> 8) & 0xFF))
+		l = read_line(f)
+	code = sio.getvalue()
+	sio.close()
+	return code
+
 def read_code(f):
 	arg_count = 0
 	n_locals = 0
@@ -139,21 +163,7 @@ def read_code(f):
 		elif line[0] == 'cellvars':
 			cellvars = tuple(read_list(f, parse_int(line[1])))
 		elif line[0] == 'instructions':
-			sio = StringIO()
-			l = read_line(f)
-			while l != 'end':
-				if is_number(l[0]):
-					sio.seek(parse_int(l.split()[0]))
-					l = l.split(' ', 1)[1]
-				line = l.split()
-				sio.write(chr(opmap[line[0]]))
-				if len(line) == 2:
-					oparg = parse_int(line[1])
-					sio.write(chr(oparg & 0xFF))
-					sio.write(chr((oparg >> 8) & 0xFF))
-				l = read_line(f)
-			code = sio.getvalue()
-			sio.close()
+			code = assemble_instructions(f)
 		elif line[0] == 'filename':
 			filename = l.split('"')[1]
 		elif line[0] == 'name':
