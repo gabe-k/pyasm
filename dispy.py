@@ -37,7 +37,7 @@ def write_object(f, o, indents):
 	elif type(o) == types.ListType:
 		write_list(f, o, indents, 'list')
 	elif type(o) == types.TupleType:
-		write_list(f, o, indents, 'list')
+		write_list(f, o, indents, 'tuple')
 	elif type(o) == types.NoneType:
 		write_none(f, o, indents)
 	elif type(o) == types.FloatType:
@@ -49,8 +49,8 @@ def write_float(f, d, indents):
 def write_none(f, s, indents):
 	f.write(('\t' * indents) + 'none\n')
 
-def write_string(f, s, indents):
-	f.write(('\t' * indents) + 'string "' + s + '"\n')
+def write_string(f, s, indents, prefix='string'):
+	f.write(('\t' * indents) + prefix + ' "' + s + '"\n')
 
 def write_int(f, i, indents):
 	f.write(('\t' * indents) + 'int ' + str(i) + '\n')
@@ -78,7 +78,7 @@ def write_code(f, c, indents):
 	write_list(f, c.co_varnames, indents + 1, 'varnames')
 	write_list(f, c.co_freevars, indents + 1, 'freevars')
 	write_list(f, c.co_cellvars, indents + 1, 'cellvars')
-	
+
 	instructions = disassemble(c.co_code)
 	f.write('\t' * (indents + 1))
 	f.write('instructions\n')
@@ -89,6 +89,9 @@ def write_code(f, c, indents):
 
 	f.write('\t' * (indents + 1))
 	f.write('end\n')
+	write_string(f, c.co_name, indents + 1, 'name')
+	write_string(f, c.co_filename, indents + 1, 'filename')
+	write_string(f, c.co_lnotab.encode('string-escape'), indents + 1, 'lnotab')
 	f.write('\t' * indents)
 	f.write('end\n')
 

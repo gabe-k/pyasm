@@ -167,9 +167,9 @@ def read_code(f):
 		elif line[0] == 'filename':
 			filename = l.split('"')[1]
 		elif line[0] == 'name':
-			name = l.split('"')[1]
+			name = intern(l.split('"')[1])
 		elif line[0] == 'lnotab':
-			lnotab = l.split('"')[1]
+			lnotab = l.split('"')[1].decode('string-escape')
 		elif line[0] == 'first_line_no':
 			first_line_no = parse_int(line[1])
 		l = read_line(f)
