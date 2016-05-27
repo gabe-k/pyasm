@@ -50,7 +50,7 @@ def write_none(f, s, indents):
 	f.write(('\t' * indents) + 'none\n')
 
 def write_string(f, s, indents, prefix='string'):
-	f.write(('\t' * indents) + prefix + ' "' + s + '"\n')
+	f.write(('\t' * indents) + prefix + ' "' + s.encode("string-escape") + '"\n')
 
 def write_int(f, i, indents):
 	f.write(('\t' * indents) + 'int ' + str(i) + '\n')
