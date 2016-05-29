@@ -73,8 +73,20 @@ def write_int(f, i, indents):
 
 def write_list(f, l, indents, prefix):
 	f.write(('\t' * indents) + prefix + ' ' + str(len(l)) + '\n')
-	for i in l:
-		write_object(f, i, indents + 1)
+	dupe_count = 1
+	i = 0
+	while i < len(l):
+		dupe_count = 1
+		while i < len(l) - 1 and l[i] == l[i + 1]:
+			dupe_count += 1
+			i += 1
+
+		f.write('\t' * (indents + 1))
+		if dupe_count > 1:
+			f.write(int_to_str(dupe_count) + " * ")
+		write_object(f, l[i], 0)
+		i += 1
+
 	f.write(('\t' * indents) + 'end\n')
 
 def generate_autocomment(c, instruction, oparg):
