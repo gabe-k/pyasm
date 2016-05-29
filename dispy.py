@@ -35,7 +35,6 @@ def disassemble_file(filename):
 	o.read(8)
 	c = marshal.load(o)
 	o.close()
-	#print disassemble(c.co_code)
 	f = open(filename.split('.')[0] + '.pyasm', 'w')
 	write_object(f, c, 0, 1)
 	f.close()
