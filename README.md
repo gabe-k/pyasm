@@ -1,5 +1,5 @@
 # pyasm
-Assembler and decompiler for compiled Python
+Assembler and disassembler for compiled Python
 
 ### makepy
 Builds a pyasm file into a pyc file
