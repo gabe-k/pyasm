@@ -1,19 +1,23 @@
-from dis import opname
+from dis import opname, opmap
 import marshal
 import sys
 import types
-
 
 def disassemble(s):
 	i = 0
 	#r = ''
 	o = []
-	while i < len(s):
-		r = opname[ord(s[i])] + ' '
-		if ord(s[i]) >= 90: # these are the ones with args
-			r += str(ord(s[i+1]) | (ord(s[i+2]) << 8))
+	while i < len(s.co_code):
+		op = ord(s.co_code[i])
+		r = opname[op] + ' '
+		if op >= 90: # these are the ones with args
+			oparg = ord(s.co_code[i+1]) | (ord(s.co_code[i+2]) << 8)
+			r += int_to_str(oparg)
 			i += 2
 		i += 1
+		comment = generate_autocomment(s, op, oparg)
+		if comment:
+			r += " # " + comment
 		o.append(r)
 	return o
 
@@ -52,14 +56,28 @@ def write_none(f, s, indents):
 def write_string(f, s, indents, prefix='string'):
 	f.write(('\t' * indents) + prefix + ' "' + s.encode("string-escape") + '"\n')
 
+def int_to_str(i):
+	if i & 0xF == 0 or i & 0xF == 0xF:
+		return hex(i)
+	return str(i)
+
 def write_int(f, i, indents):
-	f.write(('\t' * indents) + 'int ' + str(i) + '\n')
+	f.write(('\t' * indents) + 'int ' + int_to_str(i) + '\n')
 
 def write_list(f, l, indents, prefix):
 	f.write(('\t' * indents) + prefix + ' ' + str(len(l)) + '\n')
 	for i in l:
 		write_object(f, i, indents + 1)
 	f.write(('\t' * indents) + 'end\n')
+
+def generate_autocomment(c, instruction, oparg):
+	if instruction == opmap['LOAD_CONST'] and oparg < len(c.co_consts):
+		return str(c.co_consts[oparg])
+	elif instruction == opmap['LOAD_FAST'] or instruction == opmap['STORE_FAST'] and oparg < len(c.co_varnames):
+		return str(c.co_varnames[oparg])
+	elif instruction == opmap['LOAD_NAME'] or instruction == opmap['STORE_NAME'] and oparg < len(c.co_names):
+		return str(c.co_names[oparg])
+	return None
 
 def write_code(f, c, indents):
 	f.write('\t' * indents)
@@ -79,7 +97,7 @@ def write_code(f, c, indents):
 	write_list(f, c.co_freevars, indents + 1, 'freevars')
 	write_list(f, c.co_cellvars, indents + 1, 'cellvars')
 
-	instructions = disassemble(c.co_code)
+	instructions = disassemble(c)
 	f.write('\t' * (indents + 1))
 	f.write('instructions\n')
 	for i in instructions:
