@@ -84,11 +84,21 @@ def read_list(f, count):
 	index = 0
 	l = read_line(f)
 	while l != 'end':
-		if is_number(l.split()[0][0]):
+		if is_number(l.split()[0][0]) and l.split()[1] != '*':
 			index = parse_int(l.split()[0])
 			l = l.split(' ', 1)[1]
-		r[index] = read_object(f, l)
-		index += 1
+			r[index] = read_object(f, l)
+			index += 1
+		elif is_number(l.split()[0][0]):
+			count = parse_int(l.split()[0])
+			l = l.split(' ', 2)[2]
+			obj = read_object(f, l)
+			for i in range(count):
+				r[index] = obj
+				index += 1
+		else:
+			r[index] = read_object(f, l)
+			index += 1
 		l = read_line(f)
 	return r
 
