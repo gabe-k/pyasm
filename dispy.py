@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from dis import opname, opmap
 import marshal
 import sys
