@@ -91,7 +91,7 @@ def write_code(f, c, indents):
 	f.write('end\n')
 	write_string(f, c.co_name, indents + 1, 'name')
 	write_string(f, c.co_filename, indents + 1, 'filename')
-	write_string(f, c.co_lnotab.encode('string-escape'), indents + 1, 'lnotab')
+	write_string(f, c.co_lnotab, indents + 1, 'lnotab')
 	f.write('\t' * indents)
 	f.write('end\n')
 
