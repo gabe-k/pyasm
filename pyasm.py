@@ -43,7 +43,7 @@ def parse_int(i):
 	return int(i)
 
 def read_line(f):
-	return f.readline().strip().split('#')[0]
+	return f.readline().strip().split('#')[0].strip()
 
 # l is typically the next line in the stream, but can be overridden in some circumstances
 def read_object(f, l=None):
