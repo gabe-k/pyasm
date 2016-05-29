@@ -7,6 +7,7 @@ def disassemble(s):
 	i = 0
 	#r = ''
 	o = []
+	dupe_count = 1
 	while i < len(s.co_code):
 		op = ord(s.co_code[i])
 		r = opname[op] + ' '
@@ -18,6 +19,12 @@ def disassemble(s):
 		comment = generate_autocomment(s, op, oparg)
 		if comment:
 			r += " # " + comment
+		if len(o) > 0 and (r == o[-1] or r == o[-1].split(' ', 2)[-1]):
+			dupe_count += 1
+			o[-1] = int_to_str(dupe_count) + " * " + r
+			continue
+		else:
+			dupe_count = 1
 		o.append(r)
 	return o
 
