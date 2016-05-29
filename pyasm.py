@@ -38,6 +38,8 @@ def parse_file(filename):
 def parse_int(i):
 	if i[:2] == '0x':
 		return int(i, 16)
+	elif i[:2] == '0b':
+		return int(i, 2)
 	return int(i)
 
 def read_line(f):
