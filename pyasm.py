@@ -104,12 +104,43 @@ def read_float(l):
 def read_none(l):
 	return None
 
-def assemble_instructions(f):
-	sio = StringIO()
+def process_labels(f):
+	labels = {}
 	l = read_line(f)
+	pos = 0
+
 	while l != 'end':
 		count = 1
-		if len(l.split()) > 2:
+		instruction_len = 1
+		if l[-1] == ':': # check for a : to see if the current line is a label
+			labels[l[:-1]] = pos
+			count = 0 # not an instruction
+		elif len(l.split()) > 2:
+			if l.split()[1] == '*':
+				count = parse_int(l.split()[0])
+				l = l.split(' ', 2)[-1]
+
+		elif len(l.split()) == 2:
+			instruction_len = 3
+		pos += count * instruction_len
+
+		l = read_line(f)
+
+	return labels
+
+def assemble_instructions(f):
+	# save the position at the start of the instructions so we can restore it after we process labels
+	start_pos = f.tell()
+	labels = process_labels(f)
+
+	f.seek(start_pos)
+	l = read_line(f)
+	sio = StringIO()
+	while l != 'end':
+		count = 1
+		if l[-1] == ':': # skip labels
+			count = 0
+		elif len(l.split()) > 2:
 			if l.split()[1] == '*':
 				count = parse_int(l.split()[0])
 				l = l.split(' ', 2)[-1]
@@ -120,7 +151,11 @@ def assemble_instructions(f):
 			line = l.split()
 			sio.write(chr(opmap[line[0]]))
 			if len(line) == 2:
-				oparg = parse_int(line[1])
+				if line[1][0].isdigit(): # oparg is an immediate value
+					oparg = parse_int(line[1])
+				else:
+					oparg = labels[line[1]]
+
 				sio.write(chr(oparg & 0xFF))
 				sio.write(chr((oparg >> 8) & 0xFF))
 		l = read_line(f)

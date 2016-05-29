@@ -1,0 +1,12 @@
+code
+	consts 1
+		string "Labels are fun!"
+	end
+	instructions
+		print_label:
+		LOAD_CONST 0
+		PRINT_ITEM
+		PRINT_NEWLINE
+		JUMP_ABSOLUTE print_label
+	end
+end
