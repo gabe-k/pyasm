@@ -35,44 +35,53 @@ def disassemble_file(filename):
 	o.close()
 	#print disassemble(c.co_code)
 	f = open(filename.split('.')[0] + '.pyasm', 'w')
-	write_object(f, c, 0)
+	write_object(f, c, 0, 1)
 	f.close()
 
-def write_object(f, o, indents):
+def write_object(f, o, indents, count):
+	f.write('\t' * indents)
+	if count > 1:
+		f.write(int_to_str(count) + " * ")
 	if type(o) == types.CodeType:
+		f.write('code ')
 		write_code(f, o, indents)
 	elif type(o) == types.StringType:
-		write_string(f, o, indents)
+		f.write('string ')
+		write_string(f, o)
 	elif type(o) == types.IntType:
-		write_int(f, o, indents)
+		f.write('int ')
+		write_int(f, o)
 	elif type(o) == types.ListType:
-		write_list(f, o, indents, 'list')
+		f.write('list ')
+		write_list(f, o, indents)
 	elif type(o) == types.TupleType:
-		write_list(f, o, indents, 'tuple')
+		f.write('tuple ')
+		write_list(f, o, indents)
 	elif type(o) == types.NoneType:
-		write_none(f, o, indents)
+		write_none(f, o)
 	elif type(o) == types.FloatType:
-		write_float(f, o, indents)
+		f.write('float ')
+		write_float(f, o)
 
-def write_float(f, d, indents):
-	f.write(('\t' * indents) + str(d) + '\n')
+def write_float(f, d):
+	f.write(str(d) + '\n')
 
-def write_none(f, s, indents):
-	f.write(('\t' * indents) + 'none\n')
+def write_none(f, s):
+	f.write('none\n')
 
-def write_string(f, s, indents, prefix='string'):
-	f.write(('\t' * indents) + prefix + ' "' + s.encode("string-escape") + '"\n')
+def write_string(f, s):
+	f.write('"' + s.encode("string-escape") + '"\n')
 
 def int_to_str(i):
 	if i & 0xF == 0 or i & 0xF == 0xF:
 		return hex(i)
 	return str(i)
 
-def write_int(f, i, indents):
-	f.write(('\t' * indents) + 'int ' + int_to_str(i) + '\n')
+def write_int(f, i):
+	f.write(int_to_str(i) + '\n')
 
-def write_list(f, l, indents, prefix):
-	f.write(('\t' * indents) + prefix + ' ' + str(len(l)) + '\n')
+def write_list(f, l, indents):
+	f.write(str(len(l)) + '\n')
 	dupe_count = 1
 	i = 0
 	while i < len(l):
@@ -81,10 +90,7 @@ def write_list(f, l, indents, prefix):
 			dupe_count += 1
 			i += 1
 
-		f.write('\t' * (indents + 1))
-		if dupe_count > 1:
-			f.write(int_to_str(dupe_count) + " * ")
-		write_object(f, l[i], 0)
+		write_object(f, l[i], indents + 1, dupe_count)
 		i += 1
 
 	f.write(('\t' * indents) + 'end\n')
@@ -99,8 +105,7 @@ def generate_autocomment(c, instruction, oparg):
 	return None
 
 def write_code(f, c, indents):
-	f.write('\t' * indents)
-	f.write('code\n')
+	f.write('\n')
 	f.write('\t' * (indents + 1))
 	f.write('arg_count ' + str(c.co_argcount) + '\n')
 	f.write('\t' * (indents + 1))
@@ -110,11 +115,21 @@ def write_code(f, c, indents):
 	f.write('\t' * (indents + 1))
 	f.write('flags ' + str(c.co_flags) + '\n')
 	
-	write_list(f, c.co_consts, indents + 1, 'consts')
-	write_list(f, c.co_names, indents + 1, 'names')
-	write_list(f, c.co_varnames, indents + 1, 'varnames')
-	write_list(f, c.co_freevars, indents + 1, 'freevars')
-	write_list(f, c.co_cellvars, indents + 1, 'cellvars')
+	f.write('\t' * (indents + 1))
+	f.write('consts ')
+	write_list(f, c.co_consts, indents + 1)
+	f.write('\t' * (indents + 1))
+	f.write('names ')
+	write_list(f, c.co_names, indents + 1)
+	f.write('\t' * (indents + 1))
+	f.write('varnames ')
+	write_list(f, c.co_varnames, indents + 1)
+	f.write('\t' * (indents + 1))
+	f.write('freevars ')
+	write_list(f, c.co_freevars, indents + 1)
+	f.write('\t' * (indents + 1))
+	f.write('cellvars ')
+	write_list(f, c.co_cellvars, indents + 1)
 
 	instructions = disassemble(c)
 	f.write('\t' * (indents + 1))
@@ -126,9 +141,15 @@ def write_code(f, c, indents):
 
 	f.write('\t' * (indents + 1))
 	f.write('end\n')
-	write_string(f, c.co_name, indents + 1, 'name')
-	write_string(f, c.co_filename, indents + 1, 'filename')
-	write_string(f, c.co_lnotab, indents + 1, 'lnotab')
+	f.write('\t' * (indents + 1))
+	f.write('name ')
+	write_string(f, c.co_name)
+	f.write('\t' * (indents + 1))
+	f.write('filename ')
+	write_string(f, c.co_filename)
+	f.write('\t' * (indents + 1))
+	f.write('lnotab')
+	write_string(f, c.co_lnotab)
 	f.write('\t' * indents)
 	f.write('end\n')
 
