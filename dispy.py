@@ -107,30 +107,39 @@ def generate_autocomment(c, instruction, oparg):
 
 def write_code(f, c, indents):
 	f.write('\n')
-	f.write('\t' * (indents + 1))
-	f.write('arg_count ' + str(c.co_argcount) + '\n')
-	f.write('\t' * (indents + 1))
-	f.write('n_locals ' + str(c.co_nlocals) + '\n')
-	f.write('\t' * (indents + 1))
-	f.write('stack_size ' + str(c.co_stacksize) + '\n')
-	f.write('\t' * (indents + 1))
-	f.write('flags ' + str(c.co_flags) + '\n')
+	if c.co_argcount != 0:
+		f.write('\t' * (indents + 1))
+		f.write('arg_count ' + str(c.co_argcount) + '\n')
+	if c.co_nlocals != 0:
+		f.write('\t' * (indents + 1))
+		f.write('n_locals ' + str(c.co_nlocals) + '\n')
+	if c.co_stacksize != 0:
+		f.write('\t' * (indents + 1))
+		f.write('stack_size ' + str(c.co_stacksize) + '\n')
+	if c.co_flags != 0:
+		f.write('\t' * (indents + 1))
+		f.write('flags ' + str(c.co_flags) + '\n')
 	
-	f.write('\t' * (indents + 1))
-	f.write('consts ')
-	write_list(f, c.co_consts, indents + 1)
-	f.write('\t' * (indents + 1))
-	f.write('names ')
-	write_list(f, c.co_names, indents + 1)
-	f.write('\t' * (indents + 1))
-	f.write('varnames ')
-	write_list(f, c.co_varnames, indents + 1)
-	f.write('\t' * (indents + 1))
-	f.write('freevars ')
-	write_list(f, c.co_freevars, indents + 1)
-	f.write('\t' * (indents + 1))
-	f.write('cellvars ')
-	write_list(f, c.co_cellvars, indents + 1)
+	if len(c.co_consts) != 0:
+		f.write('\t' * (indents + 1))
+		f.write('consts ')
+		write_list(f, c.co_consts, indents + 1)
+	if len(c.co_names) != 0:
+		f.write('\t' * (indents + 1))
+		f.write('names ')
+		write_list(f, c.co_names, indents + 1)
+	if len(c.co_varnames) != 0:
+		f.write('\t' * (indents + 1))
+		f.write('varnames ')
+		write_list(f, c.co_varnames, indents + 1)
+	if len(c.co_freevars) != 0:
+		f.write('\t' * (indents + 1))
+		f.write('freevars ')
+		write_list(f, c.co_freevars, indents + 1)
+	if len(c.co_cellvars) != 0:
+		f.write('\t' * (indents + 1))
+		f.write('cellvars ')
+		write_list(f, c.co_cellvars, indents + 1)
 
 	instructions = disassemble(c)
 	f.write('\t' * (indents + 1))
