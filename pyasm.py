@@ -103,7 +103,19 @@ def read_list(f, count):
 	return r
 
 def read_string(l):
-	return l.split('"')[1].decode("string-escape")
+	s = l.split('"', 1)[1]
+	end_index = 0
+	escaped = False
+	for i in range(len(s)):
+		if escaped:
+			continue
+		if s[i] == '"':
+			end_index = i
+			break
+		if s[i] == '\\':
+			escaped = True
+	
+	return s[:i].decode("string-escape")
 
 def read_int(l):
 	return parse_int(l.split()[1])
