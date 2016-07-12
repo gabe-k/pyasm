@@ -71,7 +71,7 @@ def write_none(f, s):
 	f.write('none\n')
 
 def write_string(f, s):
-	f.write('"' + s.encode("string-escape") + '"\n')
+	f.write('"' + s.encode("string-escape").replace('"', '\\"') + '"\n')
 
 def int_to_str(i):
 	if i != 0 and (i & 0xF == 0 or i & 0xF == 0xF):
