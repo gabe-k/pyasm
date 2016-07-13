@@ -97,12 +97,16 @@ def write_list(f, l, indents):
 	f.write(('\t' * indents) + 'end\n')
 
 def generate_autocomment(c, instruction, oparg):
+	comment = ''
 	if instruction == opmap['LOAD_CONST'] and oparg < len(c.co_consts):
-		return str(c.co_consts[oparg])
+		comment = str(c.co_consts[oparg])
 	elif instruction == opmap['LOAD_FAST'] or instruction == opmap['STORE_FAST'] and oparg < len(c.co_varnames):
-		return str(c.co_varnames[oparg])
+		comment = str(c.co_varnames[oparg])
 	elif instruction == opmap['LOAD_NAME'] or instruction == opmap['STORE_NAME'] and oparg < len(c.co_names):
-		return str(c.co_names[oparg])
+		comment = str(c.co_names[oparg])
+
+	if len(comment) < 200:
+		return comment
 	return None
 
 def write_code(f, c, indents):
