@@ -43,7 +43,7 @@ def parse_int(i):
 	return int(i)
 
 def read_line(f):
-	return f.readline().strip().split('#')[0].strip()
+	return f.readline().strip()
 
 # l is typically the next line in the stream, but can be overridden in some circumstances
 def read_object(f, l=None):
@@ -114,7 +114,7 @@ def read_string(l):
 			break
 		if s[i] == '\\':
 			escaped = True
-	
+
 	return s[:i].decode("string-escape")
 
 def read_int(l):
@@ -128,7 +128,7 @@ def read_none(l):
 
 def process_labels(f):
 	labels = {}
-	l = read_line(f)
+	l = read_line(f).split('#')[0].strip()
 	pos = 0
 
 	while l != 'end':
@@ -156,7 +156,7 @@ def assemble_instructions(f):
 	labels = process_labels(f)
 
 	f.seek(start_pos)
-	l = read_line(f)
+	l = read_line(f).split('#')[0].strip()
 	sio = StringIO()
 	while l != 'end':
 		count = 1
@@ -180,7 +180,7 @@ def assemble_instructions(f):
 
 				sio.write(chr(oparg & 0xFF))
 				sio.write(chr((oparg >> 8) & 0xFF))
-		l = read_line(f)
+		l = read_line(f).split('#')[0].strip()
 	code = sio.getvalue()
 	sio.close()
 	return code
