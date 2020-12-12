@@ -74,8 +74,8 @@ def write_string(f, s):
 	f.write('"' + s.encode("string-escape").replace('"', '\\"') + '"\n')
 
 def int_to_str(i):
-	if i != 0 and (i & 0xF == 0 or i & 0xF == 0xF):
-		return hex(i)
+	#if i != 0 and (i & 0xF == 0 or i & 0xF == 0xF):
+	#	return hex(i)
 	return str(i)
 
 def write_int(f, i):
@@ -98,12 +98,21 @@ def write_list(f, l, indents):
 
 def generate_autocomment(c, instruction, oparg):
 	comment = ''
-	if instruction == opmap['LOAD_CONST'] and oparg < len(c.co_consts):
-		comment = str(c.co_consts[oparg])
-	elif instruction == opmap['LOAD_FAST'] or instruction == opmap['STORE_FAST'] and oparg < len(c.co_varnames):
-		comment = str(c.co_varnames[oparg])
-	elif instruction == opmap['LOAD_NAME'] or instruction == opmap['STORE_NAME'] and oparg < len(c.co_names):
-		comment = str(c.co_names[oparg])
+	if instruction == opmap['LOAD_CONST']:
+		if oparg < len(c.co_consts):
+			comment = str(c.co_consts[oparg])
+		else:
+			comment = "Error: index outside of consts"
+	elif instruction == opmap['LOAD_FAST'] or instruction == opmap['STORE_FAST']:
+		if oparg < len(c.co_varnames):
+			comment = str(c.co_varnames[oparg])
+		else:
+			comment = "Error: index outside of varnames"
+	elif instruction == opmap['LOAD_NAME'] or instruction == opmap['STORE_NAME']:
+		if oparg < len(c.co_names):
+			comment = str(c.co_names[oparg])
+		else:
+			comment = "Error: index outside of names"
 
 	if len(comment) < 200:
 		return comment
@@ -162,7 +171,7 @@ def write_code(f, c, indents):
 	f.write('filename ')
 	write_string(f, c.co_filename)
 	f.write('\t' * (indents + 1))
-	f.write('lnotab')
+	f.write('lnotab ')
 	write_string(f, c.co_lnotab)
 	f.write('\t' * indents)
 	f.write('end\n')
